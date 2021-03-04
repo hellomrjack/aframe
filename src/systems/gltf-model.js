@@ -11,24 +11,40 @@ var THREE = require('../lib/three');
  */
 module.exports.System = registerSystem('gltf-model', {
   schema: {
-    dracoDecoderPath: {default: ''}
+    dracoDecoderPath: {default: ''},
+    basisTranscoderPath: {default: ''}
   },
 
   init: function () {
-    var path = this.data.dracoDecoderPath;
-    this.dracoLoader = new THREE.DRACOLoader();
-    this.dracoLoader.setDecoderPath(path);
+    this.dracoLoader = null;
+    this.ktx2Loader = null;
+    this.update();
   },
 
   update: function () {
     var path;
-    if (this.dracoLoader) { return; }
-    path = this.data.dracoDecoderPath;
-    this.dracoLoader = new THREE.DRACOLoader();
-    this.dracoLoader.setDecoderPath(path);
+    if (!this.dracoLoader) {
+      path = this.data.dracoDecoderPath;
+      this.dracoLoader = new THREE.DRACOLoader();
+      this.dracoLoader.setDecoderPath(path);
+    }
+    if (!this.ktx2Loader) {
+
+     path=this.data.basisTranscoderPath;
+     var gl = this.el.sceneEl.renderer;
+     this.ktx2Loader = new THREE.KTX2Loader();
+     this.ktx2Loader.detectSupport(gl);
+     this.ktx2Loader.setTranscoderPath(path);
+    }
   },
 
   getDRACOLoader: function () {
     return this.dracoLoader;
+  },
+
+  getKTX2Loader: function () {
+    return this.ktx2Loader;
+
   }
+
 });
